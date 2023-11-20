@@ -8,7 +8,7 @@ import org.objectweb.asm.Opcodes;
 
 public class ExampleTransformer extends ClassVisitor {
     public ExampleTransformer(ClassVisitor cv) {
-        super(Opcodes.ASM5, cv);
+        super(Opcodes.ASM9, cv);
     }
 
     @Override
@@ -19,6 +19,8 @@ public class ExampleTransformer extends ClassVisitor {
         System.out.println(name+ " -> 2");
         System.out.println(desc+ " -> 3");
         System.out.println(signature+ " -> 4");
+
+
         // Check if the method is the 'call' method
         if ("call".equals(name) && "()V".equals(desc)) {
             // Replace the entire method with a simple print statement
@@ -38,31 +40,21 @@ public class ExampleTransformer extends ClassVisitor {
             return new MethodVisitor(Opcodes.ASM9, mv) {
                 @Override
                 public void visitCode() {
-                    super.visitCode();
-
-                    // Original
-                    mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-                    mv.visitLdcInsn("lol c");
-                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+                    // Call the overridden visitCode method of the original MethodVisitor (mv)
+                    mv.visitCode();
 
                     // New Additional Code
+                    mv.visitVarInsn(Opcodes.ALOAD, 0); // Load 'this' onto the stack
+                    mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+
                     mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
                     mv.visitLdcInsn("We have initiated this Example class");
                     mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+                    mv.visitInsn(Opcodes.RETURN);
                 }
-
-
             };
         }
 
         return mv;
-    }
-
-    public static byte[] transform(String className, byte[] classBytes) {
-        ClassReader cr = new ClassReader(classBytes);
-        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        ExampleTransformer transformer = new ExampleTransformer(cw);
-        cr.accept(transformer, ClassReader.EXPAND_FRAMES);
-        return cw.toByteArray();
     }
 }

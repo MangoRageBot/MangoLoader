@@ -1,3 +1,4 @@
 rootProject.name = 'MangoLoader'
 include 'Example'
+include 'api'
 

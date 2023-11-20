@@ -1,5 +1,7 @@
 package org.mangorage.mangoloader.core;
 
+import org.mangorage.mangoloader.api.ITransformer;
+
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
@@ -12,16 +14,12 @@ public class MangoClassLoader extends URLClassLoader {
     public void transform() {
         for (URL url : super.getURLs()) {
             List<String> contents = Utils.findFilesContentWithExtensionInJar(url.getFile(), ".mtransform");
-            for (String content : contents) {
-                String[] args = content.split(":");
-                if (args.length > 1) {
-
-                    System.out.println("Found transformer %s for %s".formatted(args[1], args[0]));
-                    try {
-                        Transformers.register(args[0], loadClass(args[1]));
-                    } catch (ClassNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
+            for (String line : contents) {
+                System.out.println("Found transformer %s".formatted(line));
+                try {
+                    Transformers.register((ITransformer) loadClass(line).newInstance());
+                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -30,8 +28,6 @@ public class MangoClassLoader extends URLClassLoader {
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         Class<?> clazz = Transformers.findClass(name, this);
-        if (clazz != null)
-            System.out.println("Transformed -> %s".formatted(name));
         return clazz != null ? clazz : super.findClass(name);
     }
 

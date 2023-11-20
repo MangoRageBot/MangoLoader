@@ -1,5 +1,10 @@
 package org.mangorage.mangoloader.core;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.ClassNode;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,27 +36,17 @@ public class Utils {
         }
     }
 
-    public static void invokeMain(String className, String[] args, ClassLoader loader) {
-        try {
-            // Load the class using the current class loader
-            Class<?> clazz = Class.forName(className, true, loader);
+    public static ClassNode getClassNode(byte[] classBytes) {
+        ClassReader cr = new ClassReader(classBytes);
+        ClassNode classNode = new ClassNode();
+        cr.accept(classNode, 0);
+        return classNode;
+    }
 
-            // Find the main method with the specified signature
-            Method mainMethod = clazz.getMethod("main", String[].class);
-
-            // Ensure the main method is public and static
-            int modifiers = mainMethod.getModifiers();
-            if (mainMethod.getReturnType() == void.class && Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers)) {
-                // Invoke the main method with the provided arguments
-                mainMethod.invoke(null, (Object) args);
-            } else {
-                System.out.println("Main method not found or not valid in class: " + className);
-            }
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+    public static byte[] getClassBytes(ClassNode classNode) {
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        classNode.accept(cw);
+        return cw.toByteArray();
     }
 
     // Find all files with a specific extension in a JAR file

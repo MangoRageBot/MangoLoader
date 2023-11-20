@@ -1,49 +1,62 @@
 package org.mangorage.mangoloader.core;
 
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import org.mangorage.mangoloader.api.ITransformer;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.ClassNode;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Transformers {
     private static final HashMap<String, Class<?>> TRANSFORMED_CLASSES = new HashMap<>();
-    private static final HashMap<String, ITransformer> TRANSFORMERS = new HashMap<>();
+    private static final List<ITransformer> TRANSFORMERS = new ArrayList<>();
+    private static final List<String> EXCLUDED = List.of(
+            "org.mangorage.mangoloader.api.ITransformer"
+    );
 
-    private static ITransformer handle(Class<?> clazz) {
-        return (name, bytes) -> {
-            try {
-                // Get the transform method using reflection
-                Method transformMethod = clazz.getDeclaredMethod("transform", String.class, byte[].class);
 
-                // Invoke the method with the input byte array
-                return (byte[]) transformMethod.invoke(null, name, bytes);
-
-            } catch (NoSuchMethodException | IllegalAccessException |
-                     InvocationTargetException e) {
-                throw new IllegalStateException(e);
-            }
-        };
-    }
-
-    public static void register(String name, Class<?> transformerClazz) {
-        TRANSFORMERS.put(name, handle(transformerClazz));
+    public static void register(ITransformer transformer) {
+        TRANSFORMERS.add(transformer);
     }
 
     public static Class<?> findClass(String name, MangoClassLoader loader) throws ClassNotFoundException {
         if (TRANSFORMED_CLASSES.containsKey(name))
             return TRANSFORMED_CLASSES.get(name);
+        if (TRANSFORMERS.isEmpty())
+            return null;
+        if (EXCLUDED.contains(name))
+            return null;
 
-        if (TRANSFORMERS.containsKey(name)) {
-            byte[] originalBytes = Utils.getClassBytes(name, loader);
+        byte[] originalBytes = Utils.getClassBytes(name, loader);
 
-            if (originalBytes == null) {
-                throw new ClassNotFoundException("Failed to load original class bytes for " + name);
+        if (originalBytes == null) {
+            throw new ClassNotFoundException("Failed to load original class bytes for " + name);
+        }
+
+        ClassNode classNode = Utils.getClassNode(Utils.getClassBytes(name, loader));
+
+        AtomicInteger result = new AtomicInteger(-1);
+        AtomicReference<ITransformer> _transformer = new AtomicReference<>();
+
+        for (ITransformer transformer : TRANSFORMERS) {
+            result.set(transformer.transform(classNode, Type.getObjectType(name)));
+            if (result.get() != -1) {
+                _transformer.set(transformer);
+                break;
             }
+        }
 
-            ITransformer iTransformer = TRANSFORMERS.get(name);
-            byte[] transformedBytes = iTransformer.transform(name, originalBytes);
+        if (result.get() != 0 && _transformer.get() != null) {
+            System.out.println("%s Transformed %s".formatted(_transformer.get().getName(), name));
+
+            byte[] transformedBytes = Utils.getClassBytes(classNode);
             Class<?> transformedClass = loader.defineClass(name, transformedBytes);
             TRANSFORMED_CLASSES.put(name, transformedClass);
+
             return transformedClass;
         }
 
