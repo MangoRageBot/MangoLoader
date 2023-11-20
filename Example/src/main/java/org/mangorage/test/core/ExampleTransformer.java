@@ -5,7 +5,6 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 
 public class ExampleTransformer extends ClassVisitor {
     public ExampleTransformer(ClassVisitor cv) {
@@ -34,7 +33,7 @@ public class ExampleTransformer extends ClassVisitor {
         return mv;
     }
 
-    public static byte[] transform(byte[] classBytes) {
+    public static byte[] transform(String className, byte[] classBytes) {
         ClassReader cr = new ClassReader(classBytes);
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         ExampleTransformer transformer = new ExampleTransformer(cw);

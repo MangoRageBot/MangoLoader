@@ -10,13 +10,13 @@ public class Transformers {
     private static final HashMap<String, ITransformer> TRANSFORMERS = new HashMap<>();
 
     private static ITransformer handle(Class<?> clazz) {
-        return (bytes) -> {
+        return (name, bytes) -> {
             try {
                 // Get the transform method using reflection
-                Method transformMethod = clazz.getDeclaredMethod("transform", byte[].class);
+                Method transformMethod = clazz.getDeclaredMethod("transform", String.class, byte[].class);
 
                 // Invoke the method with the input byte array
-                return (byte[]) transformMethod.invoke(null, bytes);
+                return (byte[]) transformMethod.invoke(null, name, bytes);
 
             } catch (NoSuchMethodException | IllegalAccessException |
                      InvocationTargetException e) {
@@ -41,7 +41,7 @@ public class Transformers {
             }
 
             ITransformer iTransformer = TRANSFORMERS.get(name);
-            byte[] transformedBytes = iTransformer.transform(originalBytes);
+            byte[] transformedBytes = iTransformer.transform(name, originalBytes);
             Class<?> transformedClass = loader.defineClass(name, transformedBytes);
             TRANSFORMED_CLASSES.put(name, transformedClass);
             return transformedClass;

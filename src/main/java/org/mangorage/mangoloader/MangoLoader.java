@@ -4,16 +4,19 @@ import org.mangorage.mangoloader.core.MangoClassLoader;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.mangorage.mangoloader.core.Utils.invokeMain;
 
+/**
+ * Example of how to use the class loader.
+ *
+ * Do not use if your wanting a class loader.
+ *
+ * This shows how to use it.
+ */
 public class MangoLoader {
     public static void main(String[] args) throws MalformedURLException {
         String mainClass = "org.mangorage.test.Test";
