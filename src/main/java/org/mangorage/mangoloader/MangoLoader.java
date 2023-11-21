@@ -21,28 +21,11 @@ import static org.mangorage.mangoloader.core.CoreUtils.invokeMain;
 public class MangoLoader {
     public static void main(String[] args) {
         String mainClass = "org.mangorage.test.Test";
-        ClassLoader parent = MangoLoader.class.getClassLoader();
+        ClassLoader parent = Thread.currentThread().getContextClassLoader();
 
-
-        List<String> files = List.of(
-                "F:\\Downloads\\Projects\\MangoLoader\\Example\\build\\libs\\Example-1.0-SNAPSHOT.jar"
-        );
-
-        List<URL> urls = files.stream()
-                .map(
-                        a -> {
-                            try {
-                                return new File(a).toURI().toURL();
-                            } catch (MalformedURLException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                )
-                .toList();
-
-        try (URLClassLoader loader = URLClassLoader.newInstance(new URL[]{}, new MangoClassLoader(urls.toArray(new URL[urls.size()]), parent))) {
-            Thread.currentThread().setContextClassLoader(loader);
+        try (var loader = new MangoClassLoader(new URL[]{}, parent)) {
             invokeMain(mainClass, args, loader);
+            System.out.println("Finished");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

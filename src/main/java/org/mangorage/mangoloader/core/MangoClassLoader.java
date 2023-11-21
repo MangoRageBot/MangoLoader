@@ -9,7 +9,8 @@ import java.util.List;
 public class MangoClassLoader extends URLClassLoader {
     public MangoClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
-        transform();
+        //transform();
+        Thread.currentThread().setContextClassLoader(this);
     }
 
     public void transform() {
@@ -27,7 +28,14 @@ public class MangoClassLoader extends URLClassLoader {
     }
 
     @Override
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        System.out.println("Loading: " + name);
+        return super.loadClass(name);
+    }
+
+    @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
+        System.out.println(name);
         Class<?> clazz = Transformers.findClass(name, this);
         return clazz != null ? clazz : super.findClass(name);
     }

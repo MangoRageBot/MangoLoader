@@ -6,12 +6,14 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -92,6 +94,40 @@ public class Utils {
         }
 
         return result;
+    }
+
+    public static ArrayList<String> findClassesInJar(URL jarFilePath) {
+        // Create an ArrayList to store class names
+        ArrayList<String> classNames = new ArrayList<>();
+
+        try {
+            // Create a JarFile object
+            JarFile jarFile = new JarFile(new File(jarFilePath.getFile()));
+
+            // Get all entries in the JAR
+            Enumeration<JarEntry> entries = jarFile.entries();
+
+            // Iterate through the entries
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+
+                // Check if the entry is a class file
+                if (entry.getName().endsWith(".class")) {
+                    // Add the class name to the ArrayList (replace '/' with '.' and remove '.class' extension)
+                    String className = entry.getName().replace('/', '.').substring(0, entry.getName().length() - 6);
+                    classNames.add(className);
+                }
+            }
+
+            // Close the JarFile
+            jarFile.close();
+        } catch (IOException e) {
+            // Print the exception (you can handle it as needed)
+            e.printStackTrace();
+        }
+
+        // Return the ArrayList of class names
+        return classNames;
     }
 
     // Read the contents of a file in a JAR entry line by line

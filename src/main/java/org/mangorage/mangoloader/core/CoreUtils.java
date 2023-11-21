@@ -8,7 +8,7 @@ public class CoreUtils {
     public static void invokeMain(String className, String[] args, ClassLoader loader) {
         try {
             // Load the class using the current class loader
-            Class<?> clazz = Class.forName(className, true, loader);
+            Class<?> clazz = loader.loadClass(className);
 
             // Find the main method with the specified signature
             Method mainMethod = clazz.getMethod("main", String[].class);
@@ -21,9 +21,8 @@ public class CoreUtils {
             } else {
                 System.out.println("Main method not found or not valid in class: " + className);
             }
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException |
+                 IllegalArgumentException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }

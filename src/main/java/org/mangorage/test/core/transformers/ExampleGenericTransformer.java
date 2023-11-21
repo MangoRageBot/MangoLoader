@@ -2,7 +2,6 @@ package org.mangorage.test.core.transformers;
 
 import org.mangorage.mangoloader.api.ITransformer;
 import org.mangorage.mangoloader.api.TransformerFlags;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.signature.SignatureReader;
@@ -10,7 +9,6 @@ import org.objectweb.asm.signature.SignatureVisitor;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.atomic.AtomicReference;

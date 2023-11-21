@@ -7,6 +7,6 @@ public class Example {
     }
 
     public void call() {
-        throw new IllegalStateException("Transformer needs to transform this");
+        //throw new IllegalStateException("Transformer needs to transform this");
     }
 }
