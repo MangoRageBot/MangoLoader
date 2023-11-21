@@ -28,7 +28,6 @@ public class Test {
      */
 
     public static void main(String[] args) {
-        System.out.println(Thread.currentThread().getContextClassLoader().getClass());
         ExampleGeneric<Integer> TEST = TokenManager.get(new ExampleGeneric<>() {});
         ExampleGeneric<Integer> TEST_TWO = TokenManager.get(new ExampleGeneric<>() {});
 

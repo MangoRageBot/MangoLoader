@@ -8,7 +8,7 @@ public class CoreUtils {
     public static void invokeMain(String className, String[] args, ClassLoader loader) {
         try {
             // Load the class using the current class loader
-            Class<?> clazz = loader.loadClass(className);
+            Class<?> clazz = Class.forName(className, false, loader);
 
             // Find the main method with the specified signature
             Method mainMethod = clazz.getMethod("main", String[].class);

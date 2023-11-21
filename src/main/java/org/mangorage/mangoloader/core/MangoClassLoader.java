@@ -7,10 +7,10 @@ import java.net.URLClassLoader;
 import java.util.List;
 
 public class MangoClassLoader extends URLClassLoader {
+
     public MangoClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
-        //transform();
-        Thread.currentThread().setContextClassLoader(this);
+        transform();
     }
 
     public void transform() {
@@ -19,7 +19,7 @@ public class MangoClassLoader extends URLClassLoader {
             for (String line : contents) {
                 System.out.println("Found transformer %s".formatted(line));
                 try {
-                    Transformers.register((ITransformer) loadClass(line).newInstance());
+                    Transformers.register((ITransformer) Class.forName(line).newInstance());
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -28,14 +28,7 @@ public class MangoClassLoader extends URLClassLoader {
     }
 
     @Override
-    public Class<?> loadClass(String name) throws ClassNotFoundException {
-        System.out.println("Loading: " + name);
-        return super.loadClass(name);
-    }
-
-    @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        System.out.println(name);
         Class<?> clazz = Transformers.findClass(name, this);
         return clazz != null ? clazz : super.findClass(name);
     }

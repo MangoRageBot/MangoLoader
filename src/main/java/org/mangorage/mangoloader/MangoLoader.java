@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.List;
 
 import static org.mangorage.mangoloader.core.CoreUtils.invokeMain;
 
@@ -19,15 +17,19 @@ import static org.mangorage.mangoloader.core.CoreUtils.invokeMain;
  * This shows how to use it.
  */
 public class MangoLoader {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MalformedURLException {
         String mainClass = "org.mangorage.test.Test";
-        ClassLoader parent = Thread.currentThread().getContextClassLoader();
+        ClassLoader parent = Thread.currentThread().getContextClassLoader().getParent();
 
-        try (var loader = new MangoClassLoader(new URL[]{}, parent)) {
+        URL main = new File("F:\\Downloads\\Projects\\MangoLoader\\build\\libs\\MangoLoader-1.0-SNAPSHOT-all.jar").toURL();
+
+        try (var loader = new MangoClassLoader(new URL[]{main}, parent)) {
+            Thread.currentThread().setContextClassLoader(loader);
             invokeMain(mainClass, args, loader);
             System.out.println("Finished");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 }
