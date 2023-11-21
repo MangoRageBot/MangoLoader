@@ -9,6 +9,7 @@ import java.util.List;
 public class MangoClassLoader extends URLClassLoader {
     public MangoClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
+        transform();
     }
 
     public void transform() {

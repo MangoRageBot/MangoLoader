@@ -39,12 +39,12 @@ public class Transformers {
 
         ClassNode classNode = Utils.getClassNode(Utils.getClassBytes(name, loader));
 
-        AtomicInteger result = new AtomicInteger(-1);
+        AtomicInteger result = new AtomicInteger(0);
         AtomicReference<ITransformer> _transformer = new AtomicReference<>();
 
         for (ITransformer transformer : TRANSFORMERS) {
             result.set(transformer.transform(classNode, Type.getObjectType(name)));
-            if (result.get() != -1) {
+            if (result.get() != 0) {
                 _transformer.set(transformer);
                 break;
             }

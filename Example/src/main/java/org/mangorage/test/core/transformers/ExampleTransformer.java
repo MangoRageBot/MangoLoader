@@ -1,4 +1,4 @@
-package org.mangorage.test.core;
+package org.mangorage.test.core.transformers;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
