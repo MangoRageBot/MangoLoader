@@ -1,13 +1,12 @@
 package org.mangorage.test.core.transformers;
 
-import org.mangorage.mangoloader.api.ITransformer;
-import org.mangorage.mangoloader.api.TransformerFlags;
+import org.mangorage.mangoloader.core.MangoClassloader;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
-public class AnnotationTransformer implements ITransformer {
+public class AnnotationTransformer implements MangoClassloader.ITransformer {
     @Override
-    public int transform(ClassNode classNode, Type classType) {
+    public MangoClassloader.TransformerFlags transform(ClassNode classNode, Type classType) {
 
 
 
@@ -16,7 +15,7 @@ public class AnnotationTransformer implements ITransformer {
 
 
 
-        return TransformerFlags.NO_REWRITE;
+        return MangoClassloader.TransformerFlags.NO_REWRITE;
     }
 
     @Override

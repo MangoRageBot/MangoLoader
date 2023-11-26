@@ -1,7 +1,6 @@
 package org.mangorage.test.core.transformers;
 
-import org.mangorage.mangoloader.api.ITransformer;
-import org.mangorage.mangoloader.api.TransformerFlags;
+import org.mangorage.mangoloader.core.MangoClassloader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.signature.SignatureReader;
@@ -13,7 +12,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ExampleGenericTransformer implements ITransformer {
+public class ExampleGenericTransformer implements MangoClassloader.ITransformer {
 
     private static final String CLASS_TYPE = "org/mangorage/test/core/ExampleGeneric";
     private static final String FUNC_NAME = "getType";
@@ -22,7 +21,7 @@ public class ExampleGenericTransformer implements ITransformer {
 
 
     @Override
-    public int transform(ClassNode classNode, Type classType) {
+    public MangoClassloader.TransformerFlags transform(ClassNode classNode, Type classType) {
 
         if (CLASS_TYPE.equals(classNode.name)) {
             for (MethodNode mtd : classNode.methods) {
@@ -30,7 +29,7 @@ public class ExampleGenericTransformer implements ITransformer {
                     mtd.access &= ~Opcodes.ACC_FINAL;
                 }
             }
-            return TransformerFlags.REWRITE;
+            return MangoClassloader.TransformerFlags.SIMPLE_REWRITE;
         } else if (CLASS_TYPE.equals(classNode.superName)) {
             AtomicReference<String> cls = new AtomicReference<>();
 
@@ -64,10 +63,10 @@ public class ExampleGenericTransformer implements ITransformer {
             mtd.visitInsn(Opcodes.ARETURN);
             mtd.visitEnd();
 
-            return TransformerFlags.REWRITE;
+            return MangoClassloader.TransformerFlags.FULL_REWRITE;
         }
 
-        return TransformerFlags.NO_REWRITE;
+        return MangoClassloader.TransformerFlags.NO_REWRITE;
     }
 
     @Override

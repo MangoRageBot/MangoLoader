@@ -1,12 +1,11 @@
 package org.mangorage.mangoloader;
 
-import org.mangorage.mangoloader.core.MangoClassLoader;
+import org.mangorage.mangoloader.core.MangoClassloader;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import static org.mangorage.mangoloader.core.CoreUtils.invokeMain;
 
 /**
@@ -23,7 +22,7 @@ public class MangoLoader {
 
         URL main = new File("F:\\Downloads\\Projects\\MangoLoader\\build\\libs\\MangoLoader-1.0-SNAPSHOT-all.jar").toURL();
 
-        try (var loader = new MangoClassLoader(new URL[]{main}, parent)) {
+        try (var loader = new MangoClassloader(new URL[]{main}, parent)) {
             Thread.currentThread().setContextClassLoader(loader);
             invokeMain(mainClass, args, loader);
             System.out.println("Finished");
